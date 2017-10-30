@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session')
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
@@ -22,26 +23,58 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+app.use(session({secret: 'keyboard cat'}));
 
-app.get('/', 
-function(req, res) {
-  res.render('index');
+// add middleware
+app.get('/', function(req, res) {
+//  res.render('res/');
+  res.redirect('/login');
 });
 
-app.get('/create', 
-function(req, res) {
-  res.render('index');
+app.get('/login', function(req, res) {
+  res.render('login');
 });
 
-app.get('/links', 
-function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.status(200).send(links.models);
-  });
+app.post('/login', function(req, res, next) {
+
+  // The following snippet gets the username and password from the user. If it matches, then it redirects
+  // you to the /create page where you will be making shortly urls.
+  var username = req.body.username;
+  var password = req.body.password;
+  if (username && password) {
+    req.session.regenerate(function() {
+      req.session.user = username;
+      req.session.password = password;
+      console.log('Username: ', req.session.user, ' Password: ', req.session.password);
+      res.redirect('/create');
+    });
+  } else {
+    res.render('login');
+  }
 });
 
-app.post('/links', 
-function(req, res) {
+app.get('/create', function(req, res) {
+
+  // This code is supposed to be able to redirect you to the login page if you have not yet logged in, and if you have logged in,
+  // render the index page so you can create shortly urls.
+  if (req.session.user && req.session.password) {
+    res.render('index');
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.get('/links', function(req, res) {
+  if (req.session.user && req.session.user) {
+    Links.reset().fetch().then(function(links) {
+      res.status(200).send(links.models);
+    });
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.post('/links', function(req, res) {
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
