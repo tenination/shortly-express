@@ -65,20 +65,32 @@ app.post('/signup', function(req, res, next) {
     username: req.body.username,
     password: req.body.password
   };
-  user.save().then(function() {
 
-  });
-
-
-  if (username && password) {
+  Users.create(data).then(function(
     req.session.regenerate(function() {
       req.session.user = username;
       req.session.password = password;
-      db.query()
-      console.log('Username: ', req.session.user, ' Password: ', req.session.password);
       res.redirect('/create');
     });
-  }
+  ))
+
+  // Links.create({
+  //   url: uri,
+  //   title: title,
+  //   baseUrl: req.headers.origin
+  // })
+  // .then(function(newLink) {
+  //   res.status(200).send(newLink);
+  // });
+
+
+  // if (username && password) {
+  //   req.session.regenerate(function() {
+  //     req.session.user = username;
+  //     req.session.password = password;
+  //     res.redirect('/create');
+  //   });
+  // }
   // db.query goes here somewhere
 });
 
