@@ -66,13 +66,40 @@ app.post('/signup', function(req, res, next) {
     password: req.body.password
   };
 
-  Users.create(data).then(function(
-    req.session.regenerate(function() {
-      req.session.user = username;
-      req.session.password = password;
-      res.redirect('/create');
-    });
-  ))
+
+
+  new User({username: username}).fetch().then(function(found) {
+    console.log('USERNAME is equal to', username);
+    if (found) {
+      console.log('FOUND');
+    } else {
+      console.log('NOT FOUND');
+
+      Users.create({
+        username: username,
+        password: password
+      });
+
+
+
+
+
+    }
+  });
+
+
+  //Find exisitng user
+    //If user end response, username taken
+    //else
+      //just save username and pw to db
+  res.end()
+  // Users.create(data).then(function(
+  //   // req.session.regenerate(function() {
+  //   //   req.session.user = username;
+  //   //   req.session.password = password;
+  //   //   res.redirect('/create');
+  //   // });
+  // ))
 
   // Links.create({
   //   url: uri,
@@ -92,7 +119,7 @@ app.post('/signup', function(req, res, next) {
   //   });
   // }
   // db.query goes here somewhere
-});
+  });
 
 app.get('/create', function(req, res) {
 
