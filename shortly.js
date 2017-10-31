@@ -48,9 +48,38 @@ app.post('/login', function(req, res, next) {
       console.log('Username: ', req.session.user, ' Password: ', req.session.password);
       res.redirect('/create');
     });
-  } else {
-    res.render('login');
   }
+});
+
+app.get('/signup', function(req, res) {
+  res.render('signup');
+});
+
+app.post('/signup', function(req, res, next) {
+  // Should store username and password into database and log in as that user
+  var username = req.body.username;
+  var password = req.body.password;
+
+  var user = new User();
+  var data = {
+    username: req.body.username,
+    password: req.body.password
+  };
+  user.save().then(function() {
+
+  });
+
+
+  if (username && password) {
+    req.session.regenerate(function() {
+      req.session.user = username;
+      req.session.password = password;
+      db.query()
+      console.log('Username: ', req.session.user, ' Password: ', req.session.password);
+      res.redirect('/create');
+    });
+  }
+  // db.query goes here somewhere
 });
 
 app.get('/create', function(req, res) {
