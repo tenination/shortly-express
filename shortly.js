@@ -27,8 +27,21 @@ app.use(session({secret: 'keyboard cat'}));
 
 // add middleware
 app.get('/', function(req, res) {
-//  res.render('res/');
+  //if (req.session.user && req.session.password) { // If username and password are found on the database...
+  console.log('TESTING: Username: ', req.session.user, ' Password: ', req.session.password);
   res.redirect('/login');
+
+  if (req.session.user && req.session.password) {
+    res.redirect('/create');
+  }
+
+  // new User({username: req.session.user, password: req.session.password}).fetch().then(function(found) {
+  //   if (found) {
+  //     res.redirect('/create');
+  //   } else {
+  //     res.redirect('/login');
+  //   }
+  // });
 });
 
 app.get('/login', function(req, res) {
@@ -46,7 +59,7 @@ app.post('/login', function(req, res, next) {
       req.session.user = username;
       req.session.password = password;
       console.log('Username: ', req.session.user, ' Password: ', req.session.password);
-      res.redirect('/create');
+      res.redirect('/');
     });
   }
 });
@@ -72,7 +85,6 @@ app.post('/signup', function(req, res, next) {
       console.log('FOUND');
       // If username is found, direct user to login page.
       res.redirect('/login');
-      //res.end('SHOULD REDIRECT TO LOGIN PAGE');
     } else {
       // If username not found, login with that username and pw and redirect to /create page.
       console.log('NOT FOUND');
@@ -83,7 +95,7 @@ app.post('/signup', function(req, res, next) {
         console.log('User ', username, ' created with password ', password, '!');
         req.session.username = username;
         req.session.password = password;
-        res.redirect('/create');
+        res.redirect('/');
       });
     }
   });
