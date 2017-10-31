@@ -66,24 +66,25 @@ app.post('/signup', function(req, res, next) {
     password: req.body.password
   };
 
-
-
   new User({username: username}).fetch().then(function(found) {
     console.log('USERNAME is equal to', username);
     if (found) {
       console.log('FOUND');
+      // If username is found, direct user to login page.
+      res.redirect('/login');
+      //res.end('SHOULD REDIRECT TO LOGIN PAGE');
     } else {
+      // If username not found, login with that username and pw and redirect to /create page.
       console.log('NOT FOUND');
-
       Users.create({
         username: username,
         password: password
+      }).then(function() {
+        console.log('User ', username, ' created with password ', password, '!');
+        req.session.username = username;
+        req.session.password = password;
+        res.redirect('/create');
       });
-
-
-
-
-
     }
   });
 
@@ -92,7 +93,6 @@ app.post('/signup', function(req, res, next) {
     //If user end response, username taken
     //else
       //just save username and pw to db
-  res.end()
   // Users.create(data).then(function(
   //   // req.session.regenerate(function() {
   //   //   req.session.user = username;
